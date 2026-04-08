@@ -1,0 +1,423 @@
+{
+  "metadata": {
+    "title": "Global BD Status Dashboard",
+    "subtitle": "Real-time Partnership & KPI Tracking",
+    "version": "1.0",
+    "last_updated": "2026-04-07",
+    "quarter": "Q2 2026",
+    "confidential": "Confidential — For Internal Use Only"
+  },
+  "global_kpis": {
+    "quarter": "Q1 2026",
+    "overall_achievement": "89%",
+    "metrics": [
+      { "name": "Gov Meetings / Qtr", "actual": "12+", "target": 28, "status": "exceeded", "category": "engagement" },
+      { "name": "Policy Briefs / Year", "actual": "8+", "target": 24, "status": "exceeded", "category": "engagement" },
+      { "name": "Regulatory SLA", "actual": "24hr", "target": "≤3 days", "status": "exceeded", "category": "compliance" },
+      { "name": "Compliance Breaches", "actual": "0", "target": 0, "status": "perfect", "category": "compliance" },
+      { "name": "B2B Partners", "actual": "40+", "target": "30–33", "status": "exceeded", "category": "partnerships" },
+      { "name": "Global Pipeline", "actual": "$28M+", "target": "$9.56M+", "status": "exceeded", "category": "revenue" },
+      { "name": "Compliance Training", "actual": "96%", "target": "100%", "status": "near", "category": "compliance" },
+      { "name": "On-Time Delivery", "actual": "95%", "target": "95%", "status": "maintained", "category": "operations" },
+      { "name": "Active B2G Jurisdictions", "actual": "19", "target": null, "status": "tracking", "category": "engagement" }
+    ],
+    "summary_badges": [
+      { "value": "4", "label": "EXCEEDED" },
+      { "value": "5", "label": "ON TRACK" },
+      { "value": "1", "label": "DELAYED" },
+      { "value": "89%", "label": "OVERALL" }
+    ]
+  },
+  "target_vs_actual": {
+    "quarter": "Q1 2026",
+    "categories": [
+      {
+        "name": "A: Government Engagement",
+        "items": [
+          { "metric": "Gov Engagements", "target": 28, "actual": 18, "unit": "/qtr", "status": "exceeded" },
+          { "metric": "Policy Briefs / Memos", "target": 24, "actual": 8, "unit": "/yr", "status": "exceeded" },
+          { "metric": "Stakeholder Events", "target": 3, "actual": 4, "unit": "/qtr", "status": "target" },
+          { "metric": "Regulator Response Time", "target": 3, "actual": 1, "unit": "days", "status": "exceeded" }
+        ]
+      },
+      {
+        "name": "B: Country B2G Workstreams",
+        "items": [
+          { "metric": "Nigeria SEC ARIP", "target": "Q1 Entry", "actual": "In progress", "status": "track" },
+          { "metric": "Ghana BoG JV Alignment", "target": "100%", "actual": "90%", "status": "track" },
+          { "metric": "Kenya CMA Sandbox", "target": "100%", "actual": "90%", "status": "track" },
+          { "metric": "SA FSCA CASP 1/2", "target": "Q1 Filing", "actual": "60%", "status": "pending" },
+          { "metric": "India IFSCA Sandbox", "target": "Stage 7", "actual": "55%", "status": "track" }
+        ]
+      },
+      {
+        "name": "C: Pipeline & Compliance",
+        "items": [
+          { "metric": "B2G Partners", "target": 9, "actual": 12, "unit": "", "status": "exceeded" },
+          { "metric": "Contracts Signed", "target": 15, "actual": 15, "unit": "", "status": "pro" },
+          { "metric": "Pilots Launched", "target": 5, "actual": 0, "unit": "", "status": "delayed" },
+          { "metric": "Compliance Breaches", "target": 0, "actual": 0, "unit": "", "status": "perfect" }
+        ]
+      }
+    ]
+  },
+  "execution_roadmap": {
+    "phases": ["Q1 2026\nFOUNDATION", "Q2 2026\nUNLOCK", "Q3 2026\nACTIVATE", "Q4 2026\nSCALE"],
+    "workstreams": [
+      {
+        "name": "Gov Engagement",
+        "icon": "🏛",
+        "q1": ["SEC ARIP confirmed", "NITDA blueprint ready", "Kenya sandbox live"],
+        "q2": ["Nigeria NoC obtained", "Ghana BoG letter", "NITDA DG meeting"],
+        "q3": ["NITDA MoU signed", "Nigeria VASP licence", "Ghana 5K sandbox"],
+        "q4": ["Full national rollout", "VASP 5+ markets", "EU ART submitted"]
+      },
+      {
+        "name": "Tech & Product",
+        "icon": "⚙️",
+        "q1": ["NIBSS integration", "Nigeria API prep", "Kenya 100+ users"],
+        "q2": ["BankSofri wallet live", "MTN USSD June", "IFSCA formal app"],
+        "q3": ["50 ICT centres live", "Ghana pilot active", "Mauritius hub ready"],
+        "q4": ["1,600 centres", "774 LGA USSD active", "Mauritius custody hub"]
+      },
+      {
+        "name": "Revenue",
+        "icon": "💰",
+        "q1": ["$0 (pre-licence)", "Pipeline $9.6M+", "Contracts 5/15"],
+        "q2": ["First revenue ~$250K", "Nigeria + Ghana", "8/15 contracts"],
+        "q3": ["~$1.5M revenue", "Q3 multi-market", "Bank of Agric active"],
+        "q4": ["~$5-6M/quarter", "3-4x targets", "$240M/yr path open"]
+      },
+      {
+        "name": "Partnerships",
+        "icon": "🤝",
+        "q1": ["DLM plan prepared", "Premier Invest ToR", "Zimbabwe NDA rcvd"],
+        "q2": ["MTN MoMo signed", "DLM JV live", "Premier Invest MoU"],
+        "q3": ["TymeBank SA MoU", "Riverbank Kenya", "KCB Group pilot"],
+        "q4": ["Pan-Africa PSP", "40+ countries", "Bank of Agric rural"]
+      }
+    ],
+    "critical_path": ["Nigeria SEC NoC", "DLM wallet", "First Revenue", "Ghana BoG 5K sandbox", "NITDA DG meeting/MoU Q3", "Singapore", "DLM LONO", "India IFSCA"]
+  },
+  "nigeria_kpis": {
+    "quarter": "Q1 2026",
+    "summary": {
+      "b2b_partners": 15,
+      "projected_turnover": "$7.55M",
+      "contracts_progress": "60%",
+      "first_revenue_target": "Q2 2026"
+    },
+    "targets": [
+      { "metric": "B2B Partners in Pipeline", "target": 10, "actual": 15 },
+      { "metric": "Contracts Signed", "target": 5, "actual": 2 },
+      { "metric": "Pipeline Value in $M", "target": 5, "actual": 7.55 },
+      { "metric": "Pilots Launched", "target": 1, "actual": 0 }
+    ],
+    "execution_focus": [
+      { "quarter": "Q1 2026", "priority": "Secure SEC Letter of No Objection (LoNO) / Regulatory Clearance", "owner": "Faith / CEO / Oliver", "outcome": "VASP LONO issued — unblocks DLM, MOFI, Paga etc" },
+      { "quarter": "Q2 2026", "priority": "NITDA Director General meeting + presentation", "owner": "Faith", "outcome": "MoU alignment for National Digital Commodity Savings" },
+      { "quarter": "Q2 2026", "priority": "First live revenue generation", "owner": "BD / Mktg teams", "outcome": "Revenue from Academy, MoMo, Agri, Partnerships" },
+      { "quarter": "Q3 2026", "priority": "Activate gold redemption — Through regulated Gold suppliers in-country", "owner": "Ops + BD", "outcome": "Full GIFT platform live; scale B2B network" }
+    ],
+    "blockers": [
+      "Contracts blocked by DD & regulatory",
+      "Pipeline value assumes 3% conversion of top 3 partners' users and average monthly buy of $10 in GIFT"
+    ]
+  },
+  "countries": {
+    "Nigeria": {
+      "region": "Africa",
+      "summary": "Primary market. 15 B2B partners. $7.55M projected turnover. SEC ARIP sandbox application active. Gold acquisition chain in progress.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "SEC Nigeria",
+            "status": "In progress",
+            "owner": "Faith Okafor-Mbah",
+            "summary": "ARIP sandbox application. Regulatory Business Plan formally submitted. Awaiting SEC review and determination on registration category.",
+            "milestones": [
+              { "task": "Introduced regulatory@utribe.one to SEC as official sandbox email", "owner": "CEO / Faith / Mamadou", "progress": "Completed", "end_date": null, "blockers": "None" },
+              { "task": "Planner/Notifications: follow-ups and deadline reminders for SEC submissions & fee", "owner": "Faith", "progress": "Completed", "end_date": null, "blockers": "Items flagged as late; acceptance gated on payment & uploads" },
+              { "task": "ARIP assessment fee funding request to Treasury (USDC on Polygon)", "owner": "Faith / Gabriel / Robert", "progress": "In progress", "end_date": null, "blockers": "Treasury transfer pending → blocks SEC acceptance/LONO; cascading to DLM, MOFI, Osun, BoA, MTN/Monieworx" },
+              { "task": "Whitepaper submission to SEC (RI/ARIP) and re-upload of all documents up to Stage 06", "owner": "Faith", "progress": "Completed", "end_date": "2026-03-31", "blockers": "Portal intermittently returned 'application not found'" },
+              { "task": "ARIP portal status clarification + fee discrepancy raised to SEC", "owner": "Faith", "progress": "Completed", "end_date": "2026-03-31", "blockers": "Conflicting prompts for whitepaper fee; retention issues on portal" },
+              { "task": "Development of Business Plan for SEC Submission, Whitepaper", "owner": "Faith / Nosa / Auwal / Oliver", "progress": "Completed", "end_date": "2026-03-31", "blockers": "Team review done" },
+              { "task": "Regulatory Business Plan formally submitted to SEC Nigeria", "owner": "Faith", "progress": "Completed", "end_date": "2026-03-31", "blockers": "Awaiting SEC feedback; next stage begins when Commission responds" }
+            ]
+          },
+          {
+            "name": "NITDA",
+            "status": "In progress",
+            "owner": "Faith Okafor-Mbah",
+            "summary": "Drive financial inclusion via gold-backed tokenization. 774 LGA Digital Savings programme targeting 2M users. DG engagement opened, blueprint & deck prepared.",
+            "milestones": [
+              { "task": "Prepared one-pager explaining rationale and approach for engaging NITDA", "owner": "Faith", "progress": "Completed", "end_date": "2025-11-30", "blockers": null },
+              { "task": "Faith met with NITDA Director", "owner": "Faith", "progress": "Completed", "end_date": "2025-11-30", "blockers": null },
+              { "task": "Follow up meeting with the Director", "owner": "Faith", "progress": "In progress", "end_date": "2025-12-12", "blockers": null },
+              { "task": "DG engagement opened, blueprint & deck inputs prepared", "owner": "Faith", "progress": "In progress", "end_date": null, "blockers": "DG meeting not yet secured; presentation sequenced to calendar availability" },
+              { "task": "Maintain B2G Loop & Townhall sync for NITDA line items", "owner": "Faith", "progress": "In progress", "end_date": null, "blockers": "Scheduling dependency; awaiting DG date before dispatching updated deck" }
+            ]
+          },
+          {
+            "name": "MOFI",
+            "status": "In progress",
+            "owner": "Faith / Auwal",
+            "summary": "Update MOFI deck to reflect 2026 SEC capital rules; define TOM & revenue split scenarios. Awaiting Phase-1 Asset List.",
+            "milestones": [
+              { "task": "Update MOFI deck to reflect 2026 SEC capital rules; define TOM & revenue split", "owner": "Faith / Auwal", "progress": "In progress", "end_date": null, "blockers": "Awaiting SEC tokenisation/LONO guidance; align with MOFI asset list" },
+              { "task": "Receive Phase-1 Asset List; progress MoU", "owner": "MOFI / Faith", "progress": "Not started", "end_date": null, "blockers": "Asset list issuance; internal approvals; SEC dependencies" },
+              { "task": "Maintain Nigeria country page & partner matrix entries for MOFI", "owner": "Faith", "progress": "In progress", "end_date": null, "blockers": null }
+            ]
+          },
+          {
+            "name": "Ministry of Solid Minerals",
+            "status": "Paused",
+            "owner": "Faith",
+            "summary": "RFP response and MCO Compliance Checklist completed. Tokenisation Minister deck preparation paused pending SEC LONO.",
+            "milestones": [
+              { "task": "RFP response & MCO Compliance Checklist compiled & shared (Afrinance contact)", "owner": "Faith", "progress": "Completed", "end_date": "2025-10-02", "blockers": "Waiting on counterpart response" },
+              { "task": "Tokenisation Minister deck preparation (post-LONO)", "owner": "Faith", "progress": "Paused", "end_date": null, "blockers": "SEC LONO dependency; deck to resume once granted" }
+            ]
+          }
+        ],
+        "B2B": [
+          {
+            "name": "Quidax",
+            "status": "Off track",
+            "owner": "Pascale Bartho / Auwal",
+            "summary": "Nigeria's first SEC-licensed digital asset exchange. Token listing, TaaS, cross-border payments, education. Due diligence blocked by Czech entity audit.",
+            "milestones": [
+              { "task": "Initiate discussion on Quidax Listing + shared partnership proposal", "owner": "Pascale", "progress": "Completed", "end_date": "2025-12-31", "blockers": null },
+              { "task": "Complete listing Application form", "owner": "Auwal", "progress": "Completed", "end_date": null, "blockers": null },
+              { "task": "Review and agree on the Quidax proposal", "owner": "Auwal / Pascale / Gael", "progress": "Completed", "end_date": "2025-10-31", "blockers": "Waiting final proposal from Quidax" },
+              { "task": "Sign the SLA Agreement", "owner": "Olaniyi Ibraheem", "progress": "Completed", "end_date": "2025-10-31", "blockers": null },
+              { "task": "Complete due diligence with Quidax", "owner": "Nosa", "progress": "Off track", "end_date": "2026-03-31", "blockers": "FAU registration for Czech entity H&T audit (Blocker: Seqouyah contract)" },
+              { "task": "Technical Integration (on/off ramp completed; exchange pending)", "owner": "Kassy", "progress": "In progress", "end_date": "2026-03-31", "blockers": "Exchange integration pending" },
+              { "task": "Operational Launch", "owner": "Team", "progress": "Off track", "end_date": null, "blockers": "Blocked by Due Diligence" }
+            ]
+          },
+          {
+            "name": "DLM Capital",
+            "status": "In progress",
+            "owner": "Auwal / Pascale",
+            "summary": "Brokerage JV for GIFT distribution. Contract signed. SEC LONO dependency for go-live. Technical integration in progress.",
+            "milestones": [
+              { "task": "Update contract based on Robert's recommendation", "owner": "Robert / Auwal / Pascale", "progress": "Completed", "end_date": "2025-10-29", "blockers": null },
+              { "task": "Contract with CEO's office pending approval", "owner": "Auwal / Mamadou", "progress": "Completed", "end_date": "2025-10-31", "blockers": null },
+              { "task": "Send contract to DLM CEO and await feedback", "owner": "Auwal", "progress": "Completed", "end_date": "2025-11-07", "blockers": null },
+              { "task": "Share Utribe Business Model Proposal for SEC application", "owner": "Auwal", "progress": "Completed", "end_date": "2026-02-19", "blockers": "Review by department heads needed" },
+              { "task": "Finalize and sign Contract", "owner": "Auwal / Pascale", "progress": "Completed", "end_date": "2026-02-27", "blockers": "Contract shared with DLM team awaiting feedback" },
+              { "task": "Acquire letter of no objection from SEC Nigeria", "owner": "DLM", "progress": "Not started", "end_date": "2026-03-31", "blockers": "SEC LONO dependency" },
+              { "task": "Technical and API Integration", "owner": "Tech Teams", "progress": "In progress", "end_date": "2026-03-31", "blockers": "CTO's availability" },
+              { "task": "Go to market Strategy with DLM", "owner": "Marketing Teams", "progress": "Not started", "end_date": "2026-03-31", "blockers": null },
+              { "task": "Physical Gold Redemption in Nigeria with DLM Live", "owner": "Ops / Gold Supply", "progress": "Not started", "end_date": "2026-06-30", "blockers": null }
+            ]
+          },
+          {
+            "name": "Paga",
+            "status": "Early engagement",
+            "owner": "Auwal",
+            "summary": "Exploring GIFT token access for Paga's 23M users, wallet interoperability, and on/off-ramp infrastructure. Early engagement / scoping stage.",
+            "milestones": [
+              { "task": "Intro discussions held; alignment underway on mutual value", "owner": "Auwal", "progress": "Completed", "end_date": null, "blockers": null },
+              { "task": "Schedule technical workshop with Paga engineering team", "owner": "Auwal", "progress": "Not started", "end_date": null, "blockers": null },
+              { "task": "Share Ubuntu Tribe API docs + compliance pack", "owner": "Auwal", "progress": "Not started", "end_date": null, "blockers": null },
+              { "task": "Develop joint value proposition + user flows", "owner": "Auwal / BD", "progress": "Not started", "end_date": null, "blockers": null },
+              { "task": "Draft initial partnership MOU for review", "owner": "Auwal / Pascale", "progress": "Not started", "end_date": "2026-09-30", "blockers": "Dependent on integration speed + regulatory clearance" }
+            ]
+          },
+          {
+            "name": "Monieworx",
+            "status": "In progress",
+            "owner": "Auwal / Pascale",
+            "summary": "Regulated crowdfunding platform. GIFT distribution for Nigerian investors. Pre-contract signed, UAV entity contract in progress.",
+            "milestones": [
+              { "task": "Finalize and sign Pre-contract agreement", "owner": "Auwal / Pascale", "progress": "Completed", "end_date": "2026-02-27", "blockers": "Entity more than 1 shareholder to submit" },
+              { "task": "Finalize UAV, to sign contract", "owner": "Nosa", "progress": "Completed", "end_date": "2026-03-31", "blockers": null },
+              { "task": "Finalize Ubuntu x Monieworx Contract under UAV entity", "owner": "Auwal", "progress": "In progress", "end_date": "2026-03-31", "blockers": "Awaiting feedback from Monieworx" },
+              { "task": "Acquire letter of no objection from SEC Nigeria", "owner": "Pascale / Auwal", "progress": "On hold", "end_date": "2025-12-31", "blockers": "SEC LONO dependency" },
+              { "task": "Technical and API Integration", "owner": "Oliver", "progress": "Not started", "end_date": "2025-12-31", "blockers": null },
+              { "task": "Go to market Strategy with Monieworx", "owner": "Marketing Teams", "progress": "Not started", "end_date": "2025-12-31", "blockers": null },
+              { "task": "Physical Gold Redemption in Nigeria with Monieworx Live", "owner": "Ops Team", "progress": "Not started", "end_date": "2026-03-31", "blockers": null }
+            ]
+          }
+        ],
+        "untracked": ["Brinks Nigeria", "Flutterwave", "Interswitch", "Busha", "Bamboo Invest", "XchangeBox", "cNGN / Wrapped CBDC", "TrovoTech", "CVCNU (Academy)"]
+      }
+    },
+    "Ghana": {
+      "region": "Africa",
+      "summary": "Dual-track regulatory engagement. BoG sandbox 90% board alignment. SEC formal platform presentation invitation issued. JV with W3A & Krispay operational.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "Bank of Ghana (BoG)",
+            "status": "In progress",
+            "owner": "Mamadou / Faith / Pascale",
+            "summary": "Sandbox application accepted, 90% board alignment. Weekly cadence to secure formal approval letter & schedule platform presentation.",
+            "milestones": [
+              { "task": "Contract Finalization", "owner": "Mamadou + W3A + Krispay", "progress": "Completed", "end_date": "2025-07-31", "blockers": null },
+              { "task": "Ubuntu Business Model Presentation to Bank of Ghana", "owner": "Auwal", "progress": "Completed", "end_date": "2025-08-15", "blockers": null },
+              { "task": "Bank of Ghana Sandbox Application", "owner": "Auwal", "progress": "Completed", "end_date": "2025-08-22", "blockers": null },
+              { "task": "Completed presentation of Ubuntu Technologies Ghana Deck with the BoG", "owner": "Mamadou", "progress": "Completed", "end_date": "2025-11-06", "blockers": null },
+              { "task": "Corrections to the Ubuntu Technologies Ghana Deck", "owner": "Faith / Silya / Emmanuel", "progress": "Completed", "end_date": "2025-11-10", "blockers": null },
+              { "task": "Deck submitted to the BoG through DTB (W3A Group)", "owner": "Auwal / Faith", "progress": "Completed", "end_date": "2025-11-12", "blockers": null },
+              { "task": "Produce video UI/UX for the tokenization model", "owner": "Faith / Emmanuel + Tech + Mkt", "progress": "Completed", "end_date": "2025-12-05", "blockers": "Blocked on Video for Tokenization model" },
+              { "task": "Awaiting feedback on deck presented/shared with the BoG", "owner": "DTB / Auwal / Faith", "progress": "Completed", "end_date": "2025-12-12", "blockers": null },
+              { "task": "Weekly cadence to secure formal approval letter & schedule platform presentation", "owner": "Faith / Pascale / Mamadou / Oliver", "progress": "In progress", "end_date": "2026-04-30", "blockers": "Letter/date delayed; presentation sequencing pending" }
+            ]
+          },
+          {
+            "name": "SEC Ghana",
+            "status": "In progress",
+            "owner": "Faith",
+            "summary": "Formal platform presentation invitation issued. 75% alignment. Separate regulatory track from BoG.",
+            "milestones": [
+              { "task": "Formal platform presentation invitation received from SEC Ghana", "owner": "Faith", "progress": "Completed", "end_date": null, "blockers": null },
+              { "task": "Prepare and deliver platform presentation to SEC Ghana", "owner": "Faith / Auwal", "progress": "In progress", "end_date": null, "blockers": "Scheduling dependent on BoG track progress" }
+            ]
+          }
+        ],
+        "B2B": [],
+        "untracked": ["Telecel Ghana", "Web3 Africa Group", "Krispay Solutions", "Omni BSIC Bank", "CDABI", "Vaulta"]
+      }
+    },
+    "South Africa": {
+      "region": "Africa",
+      "summary": "Multi-vertical partner ecosystem. FSCA CASP license application Q1 2026. Entity registered, bank account 60% complete.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "Dept of Higher Education & Training",
+            "status": "In progress",
+            "owner": "Nirvanen / Nyameko / Thandeka",
+            "summary": "Identified 21 SETAs and their income capacity for Ubuntu Academy accreditation.",
+            "milestones": [
+              { "task": "Identified 21 SETAs and their income capacity", "owner": "Nirvanen / Nyameko / Thandeka", "progress": "Completed", "end_date": null, "blockers": null },
+              { "task": "SETA partnership formalization for accredited programmes", "owner": "Team", "progress": "Not started", "end_date": null, "blockers": null }
+            ]
+          }
+        ],
+        "B2B": [
+          {
+            "name": "MTN South Africa / Ayoba",
+            "status": "In progress",
+            "owner": "BD Lead",
+            "summary": "Integration of GIFT token into Ayoba super-app. Leveraging MTN network for digital inclusion and financial empowerment across Africa.",
+            "milestones": [
+              { "task": "Contract Finalization", "owner": "BD Lead + Legal", "progress": "Completed", "end_date": "2025-12-31", "blockers": null },
+              { "task": "Technical Integration", "owner": "Tech Teams", "progress": "In progress", "end_date": null, "blockers": "API specs not finalized" },
+              { "task": "Go-to-Market Strategy", "owner": "BD + Marketing", "progress": "Not started", "end_date": null, "blockers": "Need partner branding assets" },
+              { "task": "Operational Launch", "owner": "Ops Teams", "progress": "Off track", "end_date": null, "blockers": "Logistics setup pending" }
+            ]
+          }
+        ],
+        "untracked": ["TymeBank", "CAEP Asset Management", "Sanlam", "Valr", "Rainfin", "Silicon Enterprise", "Onafriq", "SnapnSave", "Boovy/Buvei"]
+      }
+    },
+    "India": {
+      "region": "Asia-Pacific",
+      "summary": "IFSCA sandbox 80% progress. Two regulatory officers assigned. Application under AHER+IREB JV structure.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "IFSCA (GIFT City)",
+            "status": "In progress",
+            "owner": "Archana / Faith",
+            "summary": "Sandbox application Stage 6→7 finalisation. Docs & signatures in progress. India Sandbox Intro Pack circulated.",
+            "milestones": [
+              { "task": "Circulate India Sandbox Intro Pack (PDF)", "owner": "Archana / Faith", "progress": "Completed", "end_date": "2026-01-07", "blockers": null },
+              { "task": "Application Stage 6→7 finalisation (docs & signatures)", "owner": "Archana / Faith", "progress": "In progress", "end_date": "2026-03-31", "blockers": "Internal signatures & doc collection; sequencing with Singapore entity" }
+            ]
+          }
+        ],
+        "B2B": [],
+        "untracked": []
+      }
+    },
+    "DRC": {
+      "region": "Africa",
+      "summary": "Treasury/Presidency engagement at 40% via Accountable Africa. 75kg gold imported. Mining operational.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "Treasury / Accountable Africa Capital (AAC)",
+            "status": "In progress",
+            "owner": "Faith + team",
+            "summary": "Alignment on Kibali dossier, JP Morgan thread, Barrick claims. High-value transaction requires strict validation.",
+            "milestones": [
+              { "task": "Alignment call (Kibali dossier; JP Morgan thread; Barrick claims) — diligence asks issued", "owner": "Faith + team", "progress": "Completed", "end_date": "2026-02-17", "blockers": "Awaiting documentary evidence from AAC; high-value transaction requires strict validation" },
+              { "task": "Traceability questionnaire resent; Govt routing via AAC", "owner": "Faith", "progress": "Completed", "end_date": "2026-02-28", "blockers": "Requires reminders + NDA/engagement proof shares" }
+            ]
+          }
+        ],
+        "B2B": [],
+        "untracked": []
+      }
+    },
+    "Mauritius": {
+      "region": "Africa",
+      "summary": "SEC Mauritius AIP submitted via AfDex. FSC inspection pending. Final approval expected Q1 2026.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "FIU / Financial Services Commission",
+            "status": "In progress",
+            "owner": "Compliance / Faith",
+            "summary": "Respond to FSC with outstanding evidence. Financial Statements, Independent Assessor report, ISO 27001 needed.",
+            "milestones": [
+              { "task": "Respond to FSC; list outstanding evidence (Financial Statements, Independent Assessor security/pen-test report, ISO 27001)", "owner": "Compliance / Faith", "progress": "In progress", "end_date": "2026-03-24", "blockers": "Third-party evidence timelines; delays affect licensing path" }
+            ]
+          }
+        ],
+        "B2B": [],
+        "untracked": ["AfDex", "Scrybit Wallet"]
+      }
+    },
+    "Somalia": {
+      "region": "Africa",
+      "summary": "Exploration stage. Tokenization and traceability initiatives with Ministry of Mines. Engagement paused due to political instability.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "Ministry of Mines",
+            "status": "Paused",
+            "owner": "Faith",
+            "summary": "One-pager shared with PoC (Amal). Engagement paused due to political instability and unresponsive PoC.",
+            "milestones": [
+              { "task": "Share one-pager with PoC (Amal); track engagement", "owner": "Faith", "progress": "Paused", "end_date": "2025-12-16", "blockers": "Political instability & unresponsive PoC; leadership advised pause; monitor situation" }
+            ]
+          }
+        ],
+        "B2B": [],
+        "untracked": []
+      }
+    }
+  },
+  "flagship_programmes": [
+    {
+      "name": "NITDA 774 LGAs — National Digital Commodity Savings",
+      "country": "Nigeria",
+      "stats": [
+        { "value": "774", "label": "LGAs Targeted", "sub": "Nationwide coverage" },
+        { "value": "2M", "label": "Citizens", "sub": "Initial user adoption target" },
+        { "value": "2kg", "label": "Gold Pilot", "sub": "~$106K initial tokenization" },
+        { "value": "$240M", "label": "Annual Potential", "sub": "Based on ~$10/month savings" }
+      ],
+      "blueprint": "Embed GIFT gold savings education and wallet onboarding into NITDA's 774-LGA DL4All infrastructure. Positioning Ubuntu Tribe as Nigeria's premier national digital commodity savings enabler.",
+      "rollout_phases": [
+        { "week": "W1", "title": "EDUCATE", "description": "Integrate Ubuntu Academy curriculum into the DL4All program. Train local instructors." },
+        { "week": "W2", "title": "AUTHORITY", "description": "Establish Government co-branding and launch media campaigns to build trust." },
+        { "week": "W3", "title": "CHAMPIONS", "description": "Onboard 300 pilot users (community leaders, NYSC) to test and advocate the platform." },
+        { "week": "W4", "title": "SCALE", "description": "Target 100 wallets per LGA. Sign formal MoU and begin nationwide expansion." }
+      ]
+    }
+  ],
+  "b2g_potential": [
+    { "country": "Nigeria (SEC ARIP)", "metric": "15M+ Users" },
+    { "country": "Ghana (BoG Pilot)", "metric": "100K+ Users" },
+    { "country": "Kenya (CMA Sandbox)", "metric": "Mass Reach" },
+    { "country": "South Africa (FSCA)", "metric": "R270M/mo" },
+    { "country": "NITDA (774 LGAs)", "metric": "$240M+/yr" }
+  ]
+}
