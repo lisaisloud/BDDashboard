@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ubuntu Tribe — Global BD Status Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --navy: #1A1A2E;
+  --navy-mid: #242440;
+  --gold: #C8A951;
+  --gold-dark: #A67C2E;
+  --gold-dim: rgba(200,169,81,0.12);
+  --gold-border: rgba(200,169,81,0.3);
+  --cream: #f4f2ee;
+  --white: #ffffff;
+  --text: #1A1A2E;
+  --text-mid: #4a4960;
+  --text-dim: #6b6a78;
+  --text-light: #9a9690;
+  --border: rgba(26,26,46,0.08);
+  --border-strong: rgba(26,26,46,0.14);
+  /* Status — muted Ubuntu-aligned tones */
+  --s-completed: #3d7a42;
+  --s-completed-bg: #edf5ee;
+  --s-progress: #4a6fa5;
+  --s-progress-bg: #edf2f9;
+  --s-notstarted: #8a8a8a;
+  --s-notstarted-bg: #f2f2f2;
+  --s-offtrack: #b85c1a;
+  --s-offtrack-bg: #fdf1e8;
+  --s-blocked: #a63030;
+  --s-blocked-bg: #f9eded;
+  --s-paused: #9e7c1a;
+  --s-paused-bg: #faf5e6;
+  --shadow: 0 1px 3px rgba(26,26,46,0.05);
+  --shadow-hover: 0 6px 20px rgba(26,26,46,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);line-height:1.6;min-height:100vh;}
+
+/* ── PASSWORD ── */
+.pw-overlay{position:fixed;inset:0;z-index:9999;background:var(--cream);display:flex;align-items:center;justify-content:center;transition:opacity .4s,visibility .4s;}
+.pw-overlay.gone{opacity:0;visibility:hidden;pointer-events:none;}
+.pw-box{text-align:center;max-width:380px;padding:0 24px;}
+.pw-logo{font-weight:600;font-size:12px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+.pw-heading{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.pw-sub{font-size:13px;color:var(--text-dim);margin-bottom:28px;}
+.pw-field{font-family:'DM Sans';font-size:14px;padding:11px 16px;border:1px solid var(--border-strong);border-radius:8px;background:var(--white);color:var(--text);text-align:center;outline:none;width:100%;transition:border-color .2s;}
+.pw-field:focus{border-color:var(--gold);}
+.pw-go{font-family:'DM Sans';font-size:13px;font-weight:600;padding:11px 24px;background:var(--navy);color:#fff;border:none;border-radius:8px;cursor:pointer;width:100%;margin-top:10px;transition:background .2s;}
+.pw-go:hover{background:var(--navy-mid);}
+.pw-err{font-size:12px;color:var(--s-blocked);min-height:18px;margin-top:6px;}
+
+/* ── NAV ── */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(244,242,238,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 24px;}
+.topbar-inner{max-width:1300px;margin:0 auto;display:flex;align-items:center;gap:24px;height:52px;}
+.topbar-brand{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:17px;color:var(--navy);white-space:nowrap;}
+.topbar-tabs{display:flex;gap:2px;margin-left:auto;}
+.tab{padding:7px 16px;font-size:13px;font-weight:500;color:var(--text-dim);background:none;border:none;border-radius:6px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.tab:hover{color:var(--text);background:rgba(26,26,46,.04);}
+.tab.on{color:var(--gold-dark);background:var(--gold-dim);font-weight:600;}
+.tab.alert{color:var(--s-blocked);}
+.tab.alert.on{background:rgba(166,48,48,.07);}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1300px;margin:0 auto;padding:28px 24px 80px;}
+.panel{display:none;}.panel.show{display:block;}
+
+/* ── BREADCRUMB ── */
+.crumbs{display:flex;align-items:center;gap:6px;margin-bottom:20px;font-size:13px;}
+.crumb{color:var(--text-dim);cursor:pointer;transition:color .15s;}
+.crumb:hover{color:var(--gold-dark);}
+.crumb-sep{color:var(--text-light);}
+.crumb.current{color:var(--text);font-weight:600;cursor:default;}
+
+/* ── PAGE TITLE ── */
+.pg-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.pg-sub{font-size:13px;color:var(--text-dim);margin-bottom:24px;}
+
+/* ── CHART SECTION ── */
+.chart-row{display:grid;grid-template-columns:1fr;gap:20px;margin-bottom:8px;}
+.chart-box{background:var(--white);border-radius:10px;padding:24px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:box-shadow .2s,transform .2s;}
+.chart-box:hover{box-shadow:var(--shadow-hover);transform:translateY(-1px);}
+.chart-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline;}
+.chart-hint{font-size:11px;color:var(--text-light);font-weight:400;}
+.chart-canvas-wrap{height:70px;position:relative;}
+
+/* ── LIST ITEMS ── */
+.list-item{background:var(--white);border-radius:10px;padding:18px 22px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:10px;cursor:pointer;transition:box-shadow .2s,transform .15s;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;}
+.list-item:hover{box-shadow:var(--shadow-hover);transform:translateY(-1px);}
+.li-main{}
+.li-name{font-weight:600;font-size:15px;color:var(--text);margin-bottom:2px;}
+.li-desc{font-size:13px;color:var(--text-dim);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.li-meta{display:flex;gap:16px;margin-top:6px;font-size:12px;color:var(--text-light);}
+.li-meta b{color:var(--text-mid);font-weight:500;}
+.li-right{text-align:right;flex-shrink:0;}
+
+/* ── STATUS PILL ── */
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;white-space:nowrap;letter-spacing:.3px;}
+.pill-completed{background:var(--s-completed-bg);color:var(--s-completed);}
+.pill-in-progress{background:var(--s-progress-bg);color:var(--s-progress);}
+.pill-not-started{background:var(--s-notstarted-bg);color:var(--s-notstarted);}
+.pill-off-track{background:var(--s-offtrack-bg);color:var(--s-offtrack);}
+.pill-blocked{background:var(--s-blocked-bg);color:var(--s-blocked);}
+.pill-paused,.pill-on-hold{background:var(--s-paused-bg);color:var(--s-paused);}
+.pill-early-engagement{background:#eef6f4;color:#2a7a68;}
+
+/* ── DETAIL CARD ── */
+.detail-hero{background:var(--white);border-radius:12px;padding:28px 30px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px;}
+.detail-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.detail-partner-of{font-size:13px;color:var(--text-dim);margin-bottom:12px;}
+.detail-summary{font-size:14px;line-height:1.75;color:var(--text);margin-bottom:16px;}
+.detail-meta-row{display:flex;gap:24px;flex-wrap:wrap;font-size:13px;color:var(--text-dim);}
+.detail-meta-row b{color:var(--text);font-weight:600;}
+
+/* ── MILESTONE TABLE ── */
+.ms-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:20px;}
+.ms-table th{text-align:left;padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold-dark);background:var(--cream);border-bottom:2px solid var(--gold-border);}
+.ms-table td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top;}
+.ms-table tr:last-child td{border-bottom:none;}
+.ms-table tr:hover td{background:rgba(200,169,81,.04);}
+.ms-task{max-width:420px;line-height:1.5;}
+.ms-blocker{color:var(--s-blocked);font-size:12px;font-style:italic;margin-top:3px;}
+
+/* ── BLOCKER CARD ── */
+.blk-card{background:var(--white);border-radius:10px;padding:18px 22px;border:1px solid var(--border);border-left:4px solid var(--s-blocked);box-shadow:var(--shadow);margin-bottom:10px;cursor:pointer;transition:box-shadow .2s;}
+.blk-card:hover{box-shadow:var(--shadow-hover);}
+.blk-card.off-track{border-left-color:var(--s-offtrack);}
+.blk-card.paused{border-left-color:var(--s-paused);}
+.blk-loc{font-size:12px;color:var(--text-light);margin-bottom:4px;}
+.blk-task{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.blk-reason{font-size:13px;color:var(--s-blocked);}
+.blk-card.off-track .blk-reason{color:var(--s-offtrack);}
+.blk-card.paused .blk-reason{color:var(--s-paused);}
+
+/* ── COUNTRY GROUP ── */
+.country-group{margin-bottom:28px;}
+.country-group-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.country-group-sub{font-size:12px;color:var(--text-dim);margin-bottom:14px;}
+
+/* ── FOOTER ── */
+.foot{border-top:1px solid var(--border);padding:28px 24px;text-align:center;background:var(--white);}
+.foot-text{font-size:11px;color:var(--text-light);letter-spacing:.8px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){.topbar-tabs{overflow-x:auto;} .detail-meta-row{flex-direction:column;gap:8px;}}
+
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--cream);}::-webkit-scrollbar-thumb{background:rgba(26,26,46,.12);border-radius:3px;}
+</style>
+<script>const BD_INLINE = {
+  "metadata": {
+    "title": "Global BD Status Dashboard",
+    "subtitle": "Real-time Partnership & KPI Tracking",
+    "version": "1.0",
+    "last_updated": "2026-04-07",
+    "quarter": "Q2 2026",
+    "confidential": "Confidential — For Internal Use Only"
+  },
+  "global_kpis": {
+    "quarter": "Q1 2026",
+    "overall_achievement": "89%",
+    "metrics": [
+      { "name": "Gov Meetings / Qtr", "actual": "12+", "target": 28, "status": "exceeded", "category": "engagement" },
+      { "name": "Policy Briefs / Year", "actual": "8+", "target": 24, "status": "exceeded", "category": "engagement" },
+      { "name": "Regulatory SLA", "actual": "24hr", "target": "≤3 days", "status": "exceeded", "category": "compliance" },
+      { "name": "Compliance Breaches", "actual": "0", "target": 0, "status": "perfect", "category": "compliance" },
+      { "name": "B2B Partners", "actual": "40+", "target": "30–33", "status": "exceeded", "category": "partnerships" },
+      { "name": "Global Pipeline", "actual": "$28M+", "target": "$9.56M+", "status": "exceeded", "category": "revenue" },
+      { "name": "Compliance Training", "actual": "96%", "target": "100%", "status": "near", "category": "compliance" },
+      { "name": "On-Time Delivery", "actual": "95%", "target": "95%", "status": "maintained", "category": "operations" },
+      { "name": "Active B2G Jurisdictions", "actual": "19", "target": null, "status": "tracking", "category": "engagement" }
+    ],
+    "summary_badges": [
+      { "value": "4", "label": "EXCEEDED" },
+      { "value": "5", "label": "ON TRACK" },
+      { "value": "1", "label": "DELAYED" },
+      { "value": "89%", "label": "OVERALL" }
+    ]
+  },
+  "target_vs_actual": {
+    "quarter": "Q1 2026",
+    "categories": [
+      {
+        "name": "A: Government Engagement",
+        "items": [
+          { "metric": "Gov Engagements", "target": 28, "actual": 18, "unit": "/qtr", "status": "exceeded" },
+          { "metric": "Policy Briefs / Memos", "target": 24, "actual": 8, "unit": "/yr", "status": "exceeded" },
+          { "metric": "Stakeholder Events", "target": 3, "actual": 4, "unit": "/qtr", "status": "target" },
+          { "metric": "Regulator Response Time", "target": 3, "actual": 1, "unit": "days", "status": "exceeded" }
+        ]
+      },
+      {
+        "name": "B: Country B2G Workstreams",
+        "items": [
+          { "metric": "Nigeria SEC ARIP", "target": "Q1 Entry", "actual": "In progress", "status": "track" },
+          { "metric": "Ghana BoG JV Alignment", "target": "100%", "actual": "90%", "status": "track" },
+          { "metric": "Kenya CMA Sandbox", "target": "100%", "actual": "90%", "status": "track" },
+          { "metric": "SA FSCA CASP 1/2", "target": "Q1 Filing", "actual": "60%", "status": "pending" },
+          { "metric": "India IFSCA Sandbox", "target": "Stage 7", "actual": "55%", "status": "track" }
+        ]
+      },
+      {
+        "name": "C: Pipeline & Compliance",
+        "items": [
+          { "metric": "B2G Partners", "target": 9, "actual": 12, "unit": "", "status": "exceeded" },
+          { "metric": "Contracts Signed", "target": 15, "actual": 15, "unit": "", "status": "pro" },
+          { "metric": "Pilots Launched", "target": 5, "actual": 0, "unit": "", "status": "delayed" },
+          { "metric": "Compliance Breaches", "target": 0, "actual": 0, "unit": "", "status": "perfect" }
+        ]
+      }
+    ]
+  },
+  "execution_roadmap": {
+    "phases": ["Q1 2026\nFOUNDATION", "Q2 2026\nUNLOCK", "Q3 2026\nACTIVATE", "Q4 2026\nSCALE"],
+    "workstreams": [
+      {
+        "name": "Gov Engagement",
+        "icon": "🏛",
+        "q1": ["SEC ARIP confirmed", "NITDA blueprint ready", "Kenya sandbox live"],
+        "q2": ["Nigeria NoC obtained", "Ghana BoG letter", "NITDA DG meeting"],
+        "q3": ["NITDA MoU signed", "Nigeria VASP licence", "Ghana 5K sandbox"],
+        "q4": ["Full national rollout", "VASP 5+ markets", "EU ART submitted"]
+      },
+      {
+        "name": "Tech & Product",
+        "icon": "⚙️",
+        "q1": ["NIBSS integration", "Nigeria API prep", "Kenya 100+ users"],
+        "q2": ["BankSofri wallet live", "MTN USSD June", "IFSCA formal app"],
+        "q3": ["50 ICT centres live", "Ghana pilot active", "Mauritius hub ready"],
+        "q4": ["1,600 centres", "774 LGA USSD active", "Mauritius custody hub"]
+      },
+      {
+        "name": "Revenue",
+        "icon": "💰",
+        "q1": ["$0 (pre-licence)", "Pipeline $9.6M+", "Contracts 5/15"],
+        "q2": ["First revenue ~$250K", "Nigeria + Ghana", "8/15 contracts"],
+        "q3": ["~$1.5M revenue", "Q3 multi-market", "Bank of Agric active"],
+        "q4": ["~$5-6M/quarter", "3-4x targets", "$240M/yr path open"]
+      },
+      {
+        "name": "Partnerships",
+        "icon": "🤝",
+        "q1": ["DLM plan prepared", "Premier Invest ToR", "Zimbabwe NDA rcvd"],
+        "q2": ["MTN MoMo signed", "DLM JV live", "Premier Invest MoU"],
+        "q3": ["TymeBank SA MoU", "Riverbank Kenya", "KCB Group pilot"],
+        "q4": ["Pan-Africa PSP", "40+ countries", "Bank of Agric rural"]
+      }
+    ],
+    "critical_path": ["Nigeria SEC NoC", "DLM wallet", "First Revenue", "Ghana BoG 5K sandbox", "NITDA DG meeting/MoU Q3", "Singapore", "DLM LONO", "India IFSCA"]
+  },
+  "nigeria_kpis": {
+    "quarter": "Q1 2026",
+    "summary": {
+      "b2b_partners": 15,
+      "projected_turnover": "$7.55M",
+      "contracts_progress": "60%",
+      "first_revenue_target": "Q2 2026"
+    },
+    "targets": [
+      { "metric": "B2B Partners in Pipeline", "target": 10, "actual": 15 },
+      { "metric": "Contracts Signed", "target": 5, "actual": 2 },
+      { "metric": "Pipeline Value in $M", "target": 5, "actual": 7.55 },
+      { "metric": "Pilots Launched", "target": 1, "actual": 0 }
+    ],
+    "execution_focus": [
+      { "quarter": "Q1 2026", "priority": "Secure SEC Letter of No Objection (LoNO) / Regulatory Clearance", "owner": "Faith / CEO / Oliver", "outcome": "VASP LONO issued — unblocks DLM, MOFI, Paga etc" },
+      { "quarter": "Q2 2026", "priority": "NITDA Director General meeting + presentation", "owner": "Faith", "outcome": "MoU alignment for National Digital Commodity Savings" },
+      { "quarter": "Q2 2026", "priority": "First live revenue generation", "owner": "BD / Mktg teams", "outcome": "Revenue from Academy, MoMo, Agri, Partnerships" },
+      { "quarter": "Q3 2026", "priority": "Activate gold redemption — Through regulated Gold suppliers in-country", "owner": "Ops + BD", "outcome": "Full GIFT platform live; scale B2B network" }
+    ],
+    "blockers": [
+      "Contracts blocked by DD & regulatory",
+      "Pipeline value assumes 3% conversion of top 3 partners' users and average monthly buy of $10 in GIFT"
+    ]
+  },
+  "countries": {
+    "Nigeria": {
+      "region": "Africa",
+      "summary": "Primary market. 15 B2B partners. $7.55M projected turnover. SEC ARIP sandbox application active. Gold acquisition chain in progress.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "SEC Nigeria",
+            "status": "In progress",
+            "owner": "Faith Okafor-Mbah",
+            "summary": "ARIP sandbox application. Regulatory Business Plan formally submitted. Awaiting SEC review and determination on registration category.",
+            "milestones": [
+              { "task": "Introduced regulatory@utribe.one to SEC as official sandbox email", "owner": "CEO / Faith / Mamadou", "progress": "Completed", "end_date": null, "blockers": "None" },
+              { "task": "Planner/Notifications: follow-ups and deadline reminders for SEC submissions & fee", "owner": "Faith", "progress": "Completed", "end_date": null, "blockers": "Items flagged as late; acceptance gated on payment & uploads" },
+              { "task": "ARIP assessment fee funding request to Treasury (USDC on Polygon)", "owner": "Faith / Gabriel / Robert", "progress": "In progress", "end_date": null, "blockers": "Treasury transfer pending → blocks SEC acceptance/LONO; cascading to DLM, MOFI, Osun, BoA, MTN/Monieworx" },
+              { "task": "Whitepaper submission to SEC (RI/ARIP) and re-upload of all documents up to Stage 06", "owner": "Faith", "progress": "Completed", "end_date": "2026-03-31", "blockers": "Portal intermittently returned 'application not found'" },
+              { "task": "ARIP portal status clarification + fee discrepancy raised to SEC", "owner": "Faith", "progress": "Completed", "end_date": "2026-03-31", "blockers": "Conflicting prompts for whitepaper fee; retention issues on portal" },
+              { "task": "Development of Business Plan for SEC Submission, Whitepaper", "owner": "Faith / Nosa / Auwal / Oliver", "progress": "Completed", "end_date": "2026-03-31", "blockers": "Team review done" },
+              { "task": "Regulatory Business Plan formally submitted to SEC Nigeria", "owner": "Faith", "progress": "Completed", "end_date": "2026-03-31", "blockers": "Awaiting SEC feedback; next stage begins when Commission responds" }
+            ]
+          },
+          {
+            "name": "NITDA",
+            "status": "In progress",
+            "owner": "Faith Okafor-Mbah",
+            "summary": "Drive financial inclusion via gold-backed tokenization. 774 LGA Digital Savings programme targeting 2M users. DG engagement opened, blueprint & deck prepared.",
+            "milestones": [
+              { "task": "Prepared one-pager explaining rationale and approach for engaging NITDA", "owner": "Faith", "progress": "Completed", "end_date": "2025-11-30", "blockers": null },
+              { "task": "Faith met with NITDA Director", "owner": "Faith", "progress": "Completed", "end_date": "2025-11-30", "blockers": null },
+              { "task": "Follow up meeting with the Director", "owner": "Faith", "progress": "In progress", "end_date": "2025-12-12", "blockers": null },
+              { "task": "DG engagement opened, blueprint & deck inputs prepared", "owner": "Faith", "progress": "In progress", "end_date": null, "blockers": "DG meeting not yet secured; presentation sequenced to calendar availability" },
+              { "task": "Maintain B2G Loop & Townhall sync for NITDA line items", "owner": "Faith", "progress": "In progress", "end_date": null, "blockers": "Scheduling dependency; awaiting DG date before dispatching updated deck" }
+            ]
+          },
+          {
+            "name": "MOFI",
+            "status": "In progress",
+            "owner": "Faith / Auwal",
+            "summary": "Update MOFI deck to reflect 2026 SEC capital rules; define TOM & revenue split scenarios. Awaiting Phase-1 Asset List.",
+            "milestones": [
+              { "task": "Update MOFI deck to reflect 2026 SEC capital rules; define TOM & revenue split", "owner": "Faith / Auwal", "progress": "In progress", "end_date": null, "blockers": "Awaiting SEC tokenisation/LONO guidance; align with MOFI asset list" },
+              { "task": "Receive Phase-1 Asset List; progress MoU", "owner": "MOFI / Faith", "progress": "Not started", "end_date": null, "blockers": "Asset list issuance; internal approvals; SEC dependencies" },
+              { "task": "Maintain Nigeria country page & partner matrix entries for MOFI", "owner": "Faith", "progress": "In progress", "end_date": null, "blockers": null }
+            ]
+          },
+          {
+            "name": "Ministry of Solid Minerals",
+            "status": "Paused",
+            "owner": "Faith",
+            "summary": "RFP response and MCO Compliance Checklist completed. Tokenisation Minister deck preparation paused pending SEC LONO.",
+            "milestones": [
+              { "task": "RFP response & MCO Compliance Checklist compiled & shared (Afrinance contact)", "owner": "Faith", "progress": "Completed", "end_date": "2025-10-02", "blockers": "Waiting on counterpart response" },
+              { "task": "Tokenisation Minister deck preparation (post-LONO)", "owner": "Faith", "progress": "Paused", "end_date": null, "blockers": "SEC LONO dependency; deck to resume once granted" }
+            ]
+          }
+        ],
+        "B2B": [
+          {
+            "name": "Quidax",
+            "status": "Off track",
+            "owner": "Pascale Bartho / Auwal",
+            "summary": "Nigeria's first SEC-licensed digital asset exchange. Token listing, TaaS, cross-border payments, education. Due diligence blocked by Czech entity audit.",
+            "milestones": [
+              { "task": "Initiate discussion on Quidax Listing + shared partnership proposal", "owner": "Pascale", "progress": "Completed", "end_date": "2025-12-31", "blockers": null },
+              { "task": "Complete listing Application form", "owner": "Auwal", "progress": "Completed", "end_date": null, "blockers": null },
+              { "task": "Review and agree on the Quidax proposal", "owner": "Auwal / Pascale / Gael", "progress": "Completed", "end_date": "2025-10-31", "blockers": "Waiting final proposal from Quidax" },
+              { "task": "Sign the SLA Agreement", "owner": "Olaniyi Ibraheem", "progress": "Completed", "end_date": "2025-10-31", "blockers": null },
+              { "task": "Complete due diligence with Quidax", "owner": "Nosa", "progress": "Off track", "end_date": "2026-03-31", "blockers": "FAU registration for Czech entity H&T audit (Blocker: Seqouyah contract)" },
+              { "task": "Technical Integration (on/off ramp completed; exchange pending)", "owner": "Kassy", "progress": "In progress", "end_date": "2026-03-31", "blockers": "Exchange integration pending" },
+              { "task": "Operational Launch", "owner": "Team", "progress": "Off track", "end_date": null, "blockers": "Blocked by Due Diligence" }
+            ]
+          },
+          {
+            "name": "DLM Capital",
+            "status": "In progress",
+            "owner": "Auwal / Pascale",
+            "summary": "Brokerage JV for GIFT distribution. Contract signed. SEC LONO dependency for go-live. Technical integration in progress.",
+            "milestones": [
+              { "task": "Update contract based on Robert's recommendation", "owner": "Robert / Auwal / Pascale", "progress": "Completed", "end_date": "2025-10-29", "blockers": null },
+              { "task": "Contract with CEO's office pending approval", "owner": "Auwal / Mamadou", "progress": "Completed", "end_date": "2025-10-31", "blockers": null },
+              { "task": "Send contract to DLM CEO and await feedback", "owner": "Auwal", "progress": "Completed", "end_date": "2025-11-07", "blockers": null },
+              { "task": "Share Utribe Business Model Proposal for SEC application", "owner": "Auwal", "progress": "Completed", "end_date": "2026-02-19", "blockers": "Review by department heads needed" },
+              { "task": "Finalize and sign Contract", "owner": "Auwal / Pascale", "progress": "Completed", "end_date": "2026-02-27", "blockers": "Contract shared with DLM team awaiting feedback" },
+              { "task": "Acquire letter of no objection from SEC Nigeria", "owner": "DLM", "progress": "Not started", "end_date": "2026-03-31", "blockers": "SEC LONO dependency" },
+              { "task": "Technical and API Integration", "owner": "Tech Teams", "progress": "In progress", "end_date": "2026-03-31", "blockers": "CTO's availability" },
+              { "task": "Go to market Strategy with DLM", "owner": "Marketing Teams", "progress": "Not started", "end_date": "2026-03-31", "blockers": null },
+              { "task": "Physical Gold Redemption in Nigeria with DLM Live", "owner": "Ops / Gold Supply", "progress": "Not started", "end_date": "2026-06-30", "blockers": null }
+            ]
+          },
+          {
+            "name": "Paga",
+            "status": "Early engagement",
+            "owner": "Auwal",
+            "summary": "Exploring GIFT token access for Paga's 23M users, wallet interoperability, and on/off-ramp infrastructure. Early engagement / scoping stage.",
+            "milestones": [
+              { "task": "Intro discussions held; alignment underway on mutual value", "owner": "Auwal", "progress": "Completed", "end_date": null, "blockers": null },
+              { "task": "Schedule technical workshop with Paga engineering team", "owner": "Auwal", "progress": "Not started", "end_date": null, "blockers": null },
+              { "task": "Share Ubuntu Tribe API docs + compliance pack", "owner": "Auwal", "progress": "Not started", "end_date": null, "blockers": null },
+              { "task": "Develop joint value proposition + user flows", "owner": "Auwal / BD", "progress": "Not started", "end_date": null, "blockers": null },
+              { "task": "Draft initial partnership MOU for review", "owner": "Auwal / Pascale", "progress": "Not started", "end_date": "2026-09-30", "blockers": "Dependent on integration speed + regulatory clearance" }
+            ]
+          },
+          {
+            "name": "Monieworx",
+            "status": "In progress",
+            "owner": "Auwal / Pascale",
+            "summary": "Regulated crowdfunding platform. GIFT distribution for Nigerian investors. Pre-contract signed, UAV entity contract in progress.",
+            "milestones": [
+              { "task": "Finalize and sign Pre-contract agreement", "owner": "Auwal / Pascale", "progress": "Completed", "end_date": "2026-02-27", "blockers": "Entity more than 1 shareholder to submit" },
+              { "task": "Finalize UAV, to sign contract", "owner": "Nosa", "progress": "Completed", "end_date": "2026-03-31", "blockers": null },
+              { "task": "Finalize Ubuntu x Monieworx Contract under UAV entity", "owner": "Auwal", "progress": "In progress", "end_date": "2026-03-31", "blockers": "Awaiting feedback from Monieworx" },
+              { "task": "Acquire letter of no objection from SEC Nigeria", "owner": "Pascale / Auwal", "progress": "On hold", "end_date": "2025-12-31", "blockers": "SEC LONO dependency" },
+              { "task": "Technical and API Integration", "owner": "Oliver", "progress": "Not started", "end_date": "2025-12-31", "blockers": null },
+              { "task": "Go to market Strategy with Monieworx", "owner": "Marketing Teams", "progress": "Not started", "end_date": "2025-12-31", "blockers": null },
+              { "task": "Physical Gold Redemption in Nigeria with Monieworx Live", "owner": "Ops Team", "progress": "Not started", "end_date": "2026-03-31", "blockers": null }
+            ]
+          }
+        ],
+        "untracked": ["Brinks Nigeria", "Flutterwave", "Interswitch", "Busha", "Bamboo Invest", "XchangeBox", "cNGN / Wrapped CBDC", "TrovoTech", "CVCNU (Academy)"]
+      }
+    },
+    "Ghana": {
+      "region": "Africa",
+      "summary": "Dual-track regulatory engagement. BoG sandbox 90% board alignment. SEC formal platform presentation invitation issued. JV with W3A & Krispay operational.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "Bank of Ghana (BoG)",
+            "status": "In progress",
+            "owner": "Mamadou / Faith / Pascale",
+            "summary": "Sandbox application accepted, 90% board alignment. Weekly cadence to secure formal approval letter & schedule platform presentation.",
+            "milestones": [
+              { "task": "Contract Finalization", "owner": "Mamadou + W3A + Krispay", "progress": "Completed", "end_date": "2025-07-31", "blockers": null },
+              { "task": "Ubuntu Business Model Presentation to Bank of Ghana", "owner": "Auwal", "progress": "Completed", "end_date": "2025-08-15", "blockers": null },
+              { "task": "Bank of Ghana Sandbox Application", "owner": "Auwal", "progress": "Completed", "end_date": "2025-08-22", "blockers": null },
+              { "task": "Completed presentation of Ubuntu Technologies Ghana Deck with the BoG", "owner": "Mamadou", "progress": "Completed", "end_date": "2025-11-06", "blockers": null },
+              { "task": "Corrections to the Ubuntu Technologies Ghana Deck", "owner": "Faith / Silya / Emmanuel", "progress": "Completed", "end_date": "2025-11-10", "blockers": null },
+              { "task": "Deck submitted to the BoG through DTB (W3A Group)", "owner": "Auwal / Faith", "progress": "Completed", "end_date": "2025-11-12", "blockers": null },
+              { "task": "Produce video UI/UX for the tokenization model", "owner": "Faith / Emmanuel + Tech + Mkt", "progress": "Completed", "end_date": "2025-12-05", "blockers": "Blocked on Video for Tokenization model" },
+              { "task": "Awaiting feedback on deck presented/shared with the BoG", "owner": "DTB / Auwal / Faith", "progress": "Completed", "end_date": "2025-12-12", "blockers": null },
+              { "task": "Weekly cadence to secure formal approval letter & schedule platform presentation", "owner": "Faith / Pascale / Mamadou / Oliver", "progress": "In progress", "end_date": "2026-04-30", "blockers": "Letter/date delayed; presentation sequencing pending" }
+            ]
+          },
+          {
+            "name": "SEC Ghana",
+            "status": "In progress",
+            "owner": "Faith",
+            "summary": "Formal platform presentation invitation issued. 75% alignment. Separate regulatory track from BoG.",
+            "milestones": [
+              { "task": "Formal platform presentation invitation received from SEC Ghana", "owner": "Faith", "progress": "Completed", "end_date": null, "blockers": null },
+              { "task": "Prepare and deliver platform presentation to SEC Ghana", "owner": "Faith / Auwal", "progress": "In progress", "end_date": null, "blockers": "Scheduling dependent on BoG track progress" }
+            ]
+          }
+        ],
+        "B2B": [],
+        "untracked": ["Telecel Ghana", "Web3 Africa Group", "Krispay Solutions", "Omni BSIC Bank", "CDABI", "Vaulta"]
+      }
+    },
+    "South Africa": {
+      "region": "Africa",
+      "summary": "Multi-vertical partner ecosystem. FSCA CASP license application Q1 2026. Entity registered, bank account 60% complete.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "Dept of Higher Education & Training",
+            "status": "In progress",
+            "owner": "Nirvanen / Nyameko / Thandeka",
+            "summary": "Identified 21 SETAs and their income capacity for Ubuntu Academy accreditation.",
+            "milestones": [
+              { "task": "Identified 21 SETAs and their income capacity", "owner": "Nirvanen / Nyameko / Thandeka", "progress": "Completed", "end_date": null, "blockers": null },
+              { "task": "SETA partnership formalization for accredited programmes", "owner": "Team", "progress": "Not started", "end_date": null, "blockers": null }
+            ]
+          }
+        ],
+        "B2B": [
+          {
+            "name": "MTN South Africa / Ayoba",
+            "status": "In progress",
+            "owner": "BD Lead",
+            "summary": "Integration of GIFT token into Ayoba super-app. Leveraging MTN network for digital inclusion and financial empowerment across Africa.",
+            "milestones": [
+              { "task": "Contract Finalization", "owner": "BD Lead + Legal", "progress": "Completed", "end_date": "2025-12-31", "blockers": null },
+              { "task": "Technical Integration", "owner": "Tech Teams", "progress": "In progress", "end_date": null, "blockers": "API specs not finalized" },
+              { "task": "Go-to-Market Strategy", "owner": "BD + Marketing", "progress": "Not started", "end_date": null, "blockers": "Need partner branding assets" },
+              { "task": "Operational Launch", "owner": "Ops Teams", "progress": "Off track", "end_date": null, "blockers": "Logistics setup pending" }
+            ]
+          }
+        ],
+        "untracked": ["TymeBank", "CAEP Asset Management", "Sanlam", "Valr", "Rainfin", "Silicon Enterprise", "Onafriq", "SnapnSave", "Boovy/Buvei"]
+      }
+    },
+    "India": {
+      "region": "Asia-Pacific",
+      "summary": "IFSCA sandbox 80% progress. Two regulatory officers assigned. Application under AHER+IREB JV structure.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "IFSCA (GIFT City)",
+            "status": "In progress",
+            "owner": "Archana / Faith",
+            "summary": "Sandbox application Stage 6→7 finalisation. Docs & signatures in progress. India Sandbox Intro Pack circulated.",
+            "milestones": [
+              { "task": "Circulate India Sandbox Intro Pack (PDF)", "owner": "Archana / Faith", "progress": "Completed", "end_date": "2026-01-07", "blockers": null },
+              { "task": "Application Stage 6→7 finalisation (docs & signatures)", "owner": "Archana / Faith", "progress": "In progress", "end_date": "2026-03-31", "blockers": "Internal signatures & doc collection; sequencing with Singapore entity" }
+            ]
+          }
+        ],
+        "B2B": [],
+        "untracked": []
+      }
+    },
+    "DRC": {
+      "region": "Africa",
+      "summary": "Treasury/Presidency engagement at 40% via Accountable Africa. 75kg gold imported. Mining operational.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "Treasury / Accountable Africa Capital (AAC)",
+            "status": "In progress",
+            "owner": "Faith + team",
+            "summary": "Alignment on Kibali dossier, JP Morgan thread, Barrick claims. High-value transaction requires strict validation.",
+            "milestones": [
+              { "task": "Alignment call (Kibali dossier; JP Morgan thread; Barrick claims) — diligence asks issued", "owner": "Faith + team", "progress": "Completed", "end_date": "2026-02-17", "blockers": "Awaiting documentary evidence from AAC; high-value transaction requires strict validation" },
+              { "task": "Traceability questionnaire resent; Govt routing via AAC", "owner": "Faith", "progress": "Completed", "end_date": "2026-02-28", "blockers": "Requires reminders + NDA/engagement proof shares" }
+            ]
+          }
+        ],
+        "B2B": [],
+        "untracked": []
+      }
+    },
+    "Mauritius": {
+      "region": "Africa",
+      "summary": "SEC Mauritius AIP submitted via AfDex. FSC inspection pending. Final approval expected Q1 2026.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "FIU / Financial Services Commission",
+            "status": "In progress",
+            "owner": "Compliance / Faith",
+            "summary": "Respond to FSC with outstanding evidence. Financial Statements, Independent Assessor report, ISO 27001 needed.",
+            "milestones": [
+              { "task": "Respond to FSC; list outstanding evidence (Financial Statements, Independent Assessor security/pen-test report, ISO 27001)", "owner": "Compliance / Faith", "progress": "In progress", "end_date": "2026-03-24", "blockers": "Third-party evidence timelines; delays affect licensing path" }
+            ]
+          }
+        ],
+        "B2B": [],
+        "untracked": ["AfDex", "Scrybit Wallet"]
+      }
+    },
+    "Somalia": {
+      "region": "Africa",
+      "summary": "Exploration stage. Tokenization and traceability initiatives with Ministry of Mines. Engagement paused due to political instability.",
+      "partners": {
+        "B2G": [
+          {
+            "name": "Ministry of Mines",
+            "status": "Paused",
+            "owner": "Faith",
+            "summary": "One-pager shared with PoC (Amal). Engagement paused due to political instability and unresponsive PoC.",
+            "milestones": [
+              { "task": "Share one-pager with PoC (Amal); track engagement", "owner": "Faith", "progress": "Paused", "end_date": "2025-12-16", "blockers": "Political instability & unresponsive PoC; leadership advised pause; monitor situation" }
+            ]
+          }
+        ],
+        "B2B": [],
+        "untracked": []
+      }
+    }
+  },
+  "flagship_programmes": [
+    {
+      "name": "NITDA 774 LGAs — National Digital Commodity Savings",
+      "country": "Nigeria",
+      "stats": [
+        { "value": "774", "label": "LGAs Targeted", "sub": "Nationwide coverage" },
+        { "value": "2M", "label": "Citizens", "sub": "Initial user adoption target" },
+        { "value": "2kg", "label": "Gold Pilot", "sub": "~$106K initial tokenization" },
+        { "value": "$240M", "label": "Annual Potential", "sub": "Based on ~$10/month savings" }
+      ],
+      "blueprint": "Embed GIFT gold savings education and wallet onboarding into NITDA's 774-LGA DL4All infrastructure. Positioning Ubuntu Tribe as Nigeria's premier national digital commodity savings enabler.",
+      "rollout_phases": [
+        { "week": "W1", "title": "EDUCATE", "description": "Integrate Ubuntu Academy curriculum into the DL4All program. Train local instructors." },
+        { "week": "W2", "title": "AUTHORITY", "description": "Establish Government co-branding and launch media campaigns to build trust." },
+        { "week": "W3", "title": "CHAMPIONS", "description": "Onboard 300 pilot users (community leaders, NYSC) to test and advocate the platform." },
+        { "week": "W4", "title": "SCALE", "description": "Target 100 wallets per LGA. Sign formal MoU and begin nationwide expansion." }
+      ]
+    }
+  ],
+  "b2g_potential": [
+    { "country": "Nigeria (SEC ARIP)", "metric": "15M+ Users" },
+    { "country": "Ghana (BoG Pilot)", "metric": "100K+ Users" },
+    { "country": "Kenya (CMA Sandbox)", "metric": "Mass Reach" },
+    { "country": "South Africa (FSCA)", "metric": "R270M/mo" },
+    { "country": "NITDA (774 LGAs)", "metric": "$240M+/yr" }
+  ]
+}
+;</script>
+</head>
+<body>
+
+<!-- PASSWORD -->
+<div id="pwOverlay" class="pw-overlay">
+  <div class="pw-box">
+    <div class="pw-logo">Ubuntu Tribe</div>
+    <div class="pw-heading">BD Status Dashboard</div>
+    <div class="pw-sub">Real-time Partnership Tracking</div>
+    <input type="password" id="pwIn" class="pw-field" placeholder="Enter password" autofocus>
+    <button id="pwBtn" class="pw-go">Access</button>
+    <div id="pwErr" class="pw-err"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-brand">BD Dashboard</div>
+    <div class="topbar-tabs">
+      <button class="tab on" data-tab="home">Home</button>
+      <button class="tab" data-tab="countries">Countries</button>
+      <button class="tab" data-tab="gov">Government</button>
+      <button class="tab alert" data-tab="blockers">Blockers</button>
+    </div>
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="wrap">
+  <div class="panel show" id="p-home"><div id="homeContent"></div></div>
+  <div class="panel" id="p-countries"><div id="countriesContent"></div></div>
+  <div class="panel" id="p-gov"><div id="govContent"></div></div>
+  <div class="panel" id="p-blockers"><div id="blockersContent"></div></div>
+</div>
+
+<div class="foot"><p class="foot-text">Ubuntu Tribe — BD Status Dashboard — Confidential</p></div>
+
+<script>
+let D={};
+let charts={};
+
+// ── Password ──
+function sHash(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return(h>>>0).toString(16);}
+function chkPw(){const v=document.getElementById('pwIn').value;if(sHash(v)==='ecc72b41'){document.getElementById('pwOverlay').classList.add('gone');sessionStorage.setItem('bd2','1');}else{document.getElementById('pwErr').textContent='Incorrect password';document.getElementById('pwIn').value='';document.getElementById('pwIn').focus();}}
+if(sessionStorage.getItem('bd2')==='1')document.getElementById('pwOverlay').classList.add('gone');
+document.getElementById('pwBtn').addEventListener('click',chkPw);
+document.getElementById('pwIn').addEventListener('keydown',e=>{if(e.key==='Enter')chkPw();});
+
+// ── Tab nav ──
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  document.getElementById('p-'+t.dataset.tab).classList.add('show');
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');
+  // Reset to level 1
+  const content=document.getElementById({home:'homeContent',countries:'countriesContent',gov:'govContent',blockers:'blockersContent'}[t.dataset.tab]);
+  if(t.dataset.tab==='home')renderHome();
+  if(t.dataset.tab==='countries')renderCountries();
+  if(t.dataset.tab==='gov')renderGov();
+  if(t.dataset.tab==='blockers')renderBlockers();
+}));
+
+// ── Data load ──
+async function loadData(){
+  try{const r=await fetch('bd-data.json');D=await r.json();}catch(e){}
+  if(!D.metadata&&typeof BD_INLINE!=='undefined')D=BD_INLINE;
+  if(D.metadata)init();
+}
+
+// ── Helpers ──
+function pillClass(s){
+  if(!s)return'pill-not-started';
+  const l=s.toLowerCase();
+  if(l.includes('completed'))return'pill-completed';
+  if(l.includes('off track'))return'pill-off-track';
+  if(l.includes('blocked'))return'pill-blocked';
+  if(l.includes('paused'))return'pill-paused';
+  if(l.includes('on hold'))return'pill-on-hold';
+  if(l.includes('in progress'))return'pill-in-progress';
+  if(l.includes('early'))return'pill-early-engagement';
+  return'pill-not-started';
+}
+function pillLabel(s){return s||'Not started';}
+
+function allPartners(){
+  const out=[];
+  Object.entries(D.countries).forEach(([country,cd])=>{
+    ['B2G','B2B'].forEach(ch=>{
+      (cd.partners[ch]||[]).forEach(p=>{
+        out.push({...p,country,channel:ch,region:cd.region});
+      });
+    });
+  });
+  return out;
+}
+
+function latestDate(p){
+  let latest=null;
+  (p.milestones||[]).forEach(m=>{
+    if(m.end_date){
+      const d=new Date(m.end_date);
+      if(!latest||d>latest)latest=d;
+    }
+  });
+  return latest?latest.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'—';
+}
+
+function completedCount(p){
+  return(p.milestones||[]).filter(m=>(m.progress||'').toLowerCase().includes('completed')).length;
+}
+
+// ── KPI computation from CRM data ──
+function computeKPIs(){
+  const partners=allPartners();
+  const kpis=[
+    {id:'partnerships',name:'Partnerships Closed',target:15,actual:0,items:[]},
+    {id:'contracts',name:'Contracts Completed',target:10,actual:0,items:[]},
+    {id:'gov_meetings',name:'Government Meetings',target:20,actual:0,items:[]},
+    {id:'briefs',name:'Policy Briefs & Decks',target:15,actual:0,items:[]},
+    {id:'b2g_jurisdictions',name:'Active B2G Jurisdictions',target:8,actual:0,items:[]}
+  ];
+
+  const b2gCountries=new Set();
+
+  partners.forEach(p=>{
+    // Partnerships closed: any partner with a signed contract milestone
+    const hasContract=(p.milestones||[]).some(m=>{
+      const t=m.task.toLowerCase();
+      return(t.includes('contract')||t.includes('sla')||t.includes('agreement'))&&(m.progress||'').toLowerCase().includes('completed');
+    });
+    if(hasContract){
+      kpis[0].actual++;
+      kpis[0].items.push(p);
+    }
+
+    // Contracts completed milestones
+    (p.milestones||[]).forEach(m=>{
+      const t=m.task.toLowerCase();
+      if((t.includes('contract')||t.includes('sla')||t.includes('agreement')||t.includes('sign'))&&(m.progress||'').toLowerCase().includes('completed')){
+        kpis[1].actual++;
+        kpis[1].items.push({...p,_milestone:m});
+      }
+    });
+
+    // Government meetings
+    (p.milestones||[]).forEach(m=>{
+      const t=m.task.toLowerCase();
+      if((t.includes('meeting')||t.includes('presentation')||t.includes('call')||t.includes('engagement call'))&&(m.progress||'').toLowerCase().includes('completed')){
+        kpis[2].actual++;
+        kpis[2].items.push({...p,_milestone:m});
+      }
+    });
+
+    // Policy briefs
+    (p.milestones||[]).forEach(m=>{
+      const t=m.task.toLowerCase();
+      if((t.includes('one-pager')||t.includes('brief')||t.includes('whitepaper')||t.includes('deck')||t.includes('business plan')||t.includes('business model')||t.includes('intro pack'))&&(m.progress||'').toLowerCase().includes('completed')){
+        kpis[3].actual++;
+        kpis[3].items.push({...p,_milestone:m});
+      }
+    });
+
+    // B2G jurisdictions
+    if(p.channel==='B2G'){
+      b2gCountries.add(p.country);
+    }
+  });
+
+  kpis[4].actual=b2gCountries.size;
+  [...b2gCountries].forEach(c=>{
+    kpis[4].items.push({name:c,country:c,summary:D.countries[c]?.summary||'',status:'Active',milestones:[],channel:'B2G',owner:'—'});
+  });
+
+  return kpis;
+}
+
+// ── RENDER: Home (Level 1) ──
+function renderHome(){
+  const c=document.getElementById('homeContent');
+  const kpis=computeKPIs();
+  let html=`<div class="pg-title">Performance Overview</div><p class="pg-sub">KPIs computed from live partnership data · Click any metric to see the contributing items</p>`;
+
+  kpis.forEach((k,i)=>{
+    const canvasId='kpi_chart_'+i;
+    const pct=k.target?Math.round((k.actual/k.target)*100):0;
+    const color=k.actual>=k.target?'var(--s-completed)':'var(--s-progress)';
+    html+=`<div class="chart-box" onclick="drillKPI(${i})">
+      <div class="chart-label"><span>${k.name}</span><span class="chart-hint">${k.actual} / ${k.target} target · Click for detail →</span></div>
+      <div class="chart-canvas-wrap"><canvas id="${canvasId}"></canvas></div>
+    </div>`;
+  });
+
+  c.innerHTML=html;
+
+  // Render mini bar charts
+  kpis.forEach((k,i)=>{
+    const ctx=document.getElementById('kpi_chart_'+i);
+    if(charts['kpi_'+i])charts['kpi_'+i].destroy();
+    charts['kpi_'+i]=new Chart(ctx,{
+      type:'bar',
+      data:{
+        labels:['Target','Actual'],
+        datasets:[{
+          data:[k.target,k.actual],
+          backgroundColor:[
+            'rgba(26,26,46,0.15)',
+            k.actual>=k.target?'rgba(61,122,66,0.7)':'rgba(74,111,165,0.7)'
+          ],
+          borderRadius:4,
+          barThickness:32
+        }]
+      },
+      options:{
+        indexAxis:'y',
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw}}},
+        scales:{x:{display:false,max:Math.max(k.target,k.actual)*1.2},y:{display:true,grid:{display:false},ticks:{font:{family:'DM Sans',size:12,weight:'600'},color:'#4a4960'}}}
+      }
+    });
+  });
+
+  window._kpis=kpis;
+}
+
+// ── DRILL: KPI → Item list (Level 2) ──
+window.drillKPI=function(idx){
+  const k=window._kpis[idx];
+  const c=document.getElementById('homeContent');
+  let html=`<div class="crumbs"><span class="crumb" onclick="renderHome()">Home</span><span class="crumb-sep">›</span><span class="crumb current">${k.name}</span></div>`;
+  html+=`<div class="pg-title">${k.name}</div><p class="pg-sub">${k.actual} items · Target: ${k.target}</p>`;
+
+  if(k.id==='b2g_jurisdictions'){
+    k.items.forEach(item=>{
+      html+=`<div class="list-item" onclick="drillCountryPartners('${item.country}','homeContent')">
+        <div class="li-main"><div class="li-name">${item.country}</div><div class="li-desc">${item.summary}</div></div>
+        <div class="li-right"><span class="pill pill-in-progress">Active</span></div>
+      </div>`;
+    });
+  } else if(k.id==='partnerships'){
+    k.items.forEach(item=>{
+      html+=`<div class="list-item" onclick="drillPartner('${item.country}','${item.channel}','${item.name}','homeContent')">
+        <div class="li-main"><div class="li-name">${item.name}</div><div class="li-desc">${item.summary}</div>
+        <div class="li-meta"><span><b>Country:</b> ${item.country}</span><span><b>Channel:</b> ${item.channel}</span><span><b>Owner:</b> ${item.owner}</span><span><b>Last activity:</b> ${latestDate(item)}</span></div></div>
+        <div class="li-right"><span class="pill ${pillClass(item.status)}">${pillLabel(item.status)}</span></div>
+      </div>`;
+    });
+  } else {
+    // Items with _milestone
+    k.items.forEach(item=>{
+      const m=item._milestone;
+      html+=`<div class="list-item" onclick="drillPartner('${item.country}','${item.channel}','${item.name}','homeContent')">
+        <div class="li-main"><div class="li-name">${item.name} — ${item.country}</div><div class="li-desc">${m?m.task:item.summary}</div>
+        <div class="li-meta"><span><b>Owner:</b> ${m?m.owner:item.owner}</span><span><b>Date:</b> ${m&&m.end_date?m.end_date:'—'}</span><span><b>Channel:</b> ${item.channel}</span></div></div>
+        <div class="li-right"><span class="pill ${pillClass(m?m.progress:item.status)}">${pillLabel(m?m.progress:item.status)}</span></div>
+      </div>`;
+    });
+  }
+
+  if(!k.items.length) html+=`<p style="color:var(--text-dim);padding:20px 0;">No items recorded yet for this metric.</p>`;
+  c.innerHTML=html;
+};
+
+// ── DRILL: Partner detail (Level 3) ──
+window.drillPartner=function(country,channel,partnerName,returnContainer){
+  const cd=D.countries[country];
+  if(!cd)return;
+  const p=(cd.partners[channel]||[]).find(x=>x.name===partnerName);
+  if(!p)return;
+
+  const cont=document.getElementById(returnContainer);
+  const tabName=returnContainer==='homeContent'?'Home':returnContainer==='countriesContent'?'Countries':returnContainer==='govContent'?'Government':'Blockers';
+
+  let html=`<div class="crumbs">
+    <span class="crumb" onclick="document.querySelector('[data-tab=${returnContainer==='homeContent'?'home':returnContainer==='countriesContent'?'countries':returnContainer==='govContent'?'gov':'blockers'}]').click()">${tabName}</span>
+    <span class="crumb-sep">›</span>
+    <span class="crumb" onclick="drillCountryPartners('${country}','${returnContainer}')">${country}</span>
+    <span class="crumb-sep">›</span>
+    <span class="crumb current">${p.name}</span>
+  </div>`;
+
+  html+=`<div class="detail-hero">
+    <div class="detail-name">${p.name}</div>
+    <div class="detail-partner-of">${country} · ${channel}</div>
+    <div class="detail-summary">${p.summary}</div>
+    <div class="detail-meta-row">
+      <span><b>Status:</b> <span class="pill ${pillClass(p.status)}">${pillLabel(p.status)}</span></span>
+      <span><b>Owner:</b> ${p.owner}</span>
+      <span><b>Last activity:</b> ${latestDate(p)}</span>
+      <span><b>Milestones:</b> ${completedCount(p)}/${(p.milestones||[]).length} completed</span>
+    </div>
+  </div>`;
+
+  if(p.milestones&&p.milestones.length){
+    html+=`<div style="background:var(--white);border-radius:10px;padding:20px 24px;border:1px solid var(--border);box-shadow:var(--shadow);">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px;">Milestone History</div>
+    <table class="ms-table"><thead><tr><th>Milestone</th><th>Owner</th><th>Status</th><th>Due</th><th>Blockers</th></tr></thead><tbody>`;
+    p.milestones.forEach(m=>{
+      html+=`<tr>
+        <td class="ms-task">${m.task}</td>
+        <td>${m.owner||'—'}</td>
+        <td><span class="pill ${pillClass(m.progress)}">${pillLabel(m.progress)}</span></td>
+        <td style="white-space:nowrap;">${m.end_date||'—'}</td>
+        <td>${m.blockers?'<div class="ms-blocker">'+m.blockers+'</div>':'—'}</td>
+      </tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  }
+
+  cont.innerHTML=html;
+};
+
+// ── DRILL: Country → partner list (Level 2) ──
+window.drillCountryPartners=function(country,returnContainer){
+  const cd=D.countries[country];
+  if(!cd)return;
+  const cont=document.getElementById(returnContainer);
+  const tabName=returnContainer==='homeContent'?'Home':returnContainer==='countriesContent'?'Countries':returnContainer==='govContent'?'Government':'Blockers';
+  const tabId=returnContainer==='homeContent'?'home':returnContainer==='countriesContent'?'countries':returnContainer==='govContent'?'gov':'blockers';
+
+  let html=`<div class="crumbs">
+    <span class="crumb" onclick="document.querySelector('[data-tab=${tabId}]').click()">${tabName}</span>
+    <span class="crumb-sep">›</span>
+    <span class="crumb current">${country}</span>
+  </div>`;
+
+  html+=`<div class="pg-title">${country}</div><p class="pg-sub">${cd.summary}</p>`;
+
+  const channelFilter=returnContainer==='govContent'?['B2G']:['B2G','B2B'];
+  channelFilter.forEach(ch=>{
+    const partners=cd.partners[ch]||[];
+    if(!partners.length)return;
+    html+=`<div class="country-group"><div class="country-group-title">${ch} Partnerships</div><div class="country-group-sub">${partners.length} tracked</div>`;
+    partners.forEach(p=>{
+      html+=`<div class="list-item" onclick="drillPartner('${country}','${ch}','${p.name}','${returnContainer}')">
+        <div class="li-main"><div class="li-name">${p.name}</div><div class="li-desc">${p.summary}</div>
+        <div class="li-meta"><span><b>Owner:</b> ${p.owner}</span><span><b>Last activity:</b> ${latestDate(p)}</span><span><b>Progress:</b> ${completedCount(p)}/${(p.milestones||[]).length} milestones</span></div></div>
+        <div class="li-right"><span class="pill ${pillClass(p.status)}">${pillLabel(p.status)}</span></div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+
+  // Untracked
+  if(cd.partners.untracked&&cd.partners.untracked.length){
+    html+=`<div style="margin-top:16px;padding:14px 18px;background:rgba(138,138,138,.05);border-radius:8px;border:1px dashed var(--border-strong);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;">Not yet tracked (${cd.partners.untracked.length})</div>
+    <div style="font-size:13px;color:var(--text-dim);">${cd.partners.untracked.join(' · ')}</div></div>`;
+  }
+
+  cont.innerHTML=html;
+};
+
+// ── RENDER: Countries (Level 1) ──
+function renderCountries(){
+  const c=document.getElementById('countriesContent');
+  let html=`<div class="pg-title">Countries</div><p class="pg-sub">${Object.keys(D.countries).length} countries with active partnership tracking</p>`;
+
+  const regions={};
+  Object.entries(D.countries).forEach(([name,cd])=>{
+    if(!regions[cd.region])regions[cd.region]=[];
+    regions[cd.region].push({name,...cd});
+  });
+
+  Object.entries(regions).forEach(([region,countries])=>{
+    html+=`<div class="country-group"><div class="country-group-title">${region}</div><div class="country-group-sub">${countries.length} countries</div>`;
+    countries.forEach(cd=>{
+      const total=[...(cd.partners.B2G||[]),...(cd.partners.B2B||[])];
+      const blocked=total.filter(p=>['off track','blocked','paused','on hold'].some(s=>(p.status||'').toLowerCase().includes(s)));
+      html+=`<div class="list-item" onclick="drillCountryPartners('${cd.name}','countriesContent')">
+        <div class="li-main"><div class="li-name">${cd.name}</div><div class="li-desc">${cd.summary}</div>
+        <div class="li-meta"><span><b>Partners:</b> ${total.length} tracked</span><span><b>Untracked:</b> ${(cd.partners.untracked||[]).length}</span></div></div>
+        <div class="li-right">${blocked.length?'<span class="pill pill-blocked">'+blocked.length+' issue(s)</span>':'<span class="pill pill-in-progress">Active</span>'}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  c.innerHTML=html;
+}
+
+// ── RENDER: Government (Level 1) ──
+function renderGov(){
+  const c=document.getElementById('govContent');
+  let html=`<div class="pg-title">Government Partnerships</div><p class="pg-sub">B2G engagements sorted by country</p>`;
+
+  Object.entries(D.countries).forEach(([country,cd])=>{
+    const b2g=cd.partners.B2G||[];
+    if(!b2g.length)return;
+    html+=`<div class="country-group"><div class="country-group-title">${country}</div><div class="country-group-sub">${b2g.length} B2G partnerships</div>`;
+    b2g.forEach(p=>{
+      html+=`<div class="list-item" onclick="drillPartner('${country}','B2G','${p.name}','govContent')">
+        <div class="li-main"><div class="li-name">${p.name}</div><div class="li-desc">${p.summary}</div>
+        <div class="li-meta"><span><b>Owner:</b> ${p.owner}</span><span><b>Last activity:</b> ${latestDate(p)}</span><span><b>Progress:</b> ${completedCount(p)}/${(p.milestones||[]).length}</span></div></div>
+        <div class="li-right"><span class="pill ${pillClass(p.status)}">${pillLabel(p.status)}</span></div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  c.innerHTML=html;
+}
+
+// ── RENDER: Blockers (Level 1) ──
+function renderBlockers(){
+  const c=document.getElementById('blockersContent');
+  let html=`<div class="pg-title" style="color:var(--s-blocked);">Blockers & Off-Track Items</div>`;
+  let items=[];
+
+  Object.entries(D.countries).forEach(([country,cd])=>{
+    ['B2G','B2B'].forEach(ch=>{
+      (cd.partners[ch]||[]).forEach(p=>{
+        // Partner-level status
+        const ps=(p.status||'').toLowerCase();
+        if(['off track','blocked','paused','on hold'].some(s=>ps.includes(s))){
+          items.push({country,channel:ch,partner:p.name,task:'Partnership status: '+p.status,blocker:p.summary,status:p.status,owner:p.owner});
+        }
+        // Milestone-level
+        (p.milestones||[]).forEach(m=>{
+          const ms=(m.progress||'').toLowerCase();
+          const isIssue=['off track','blocked','paused','on hold'].some(s=>ms.includes(s));
+          const hasBlocker=m.blockers&&m.blockers.length>5&&!m.blockers.toLowerCase().startsWith('none');
+          if(isIssue||(hasBlocker&&!ms.includes('completed'))){
+            items.push({country,channel:ch,partner:p.name,task:m.task,blocker:m.blockers||'Status: '+m.progress,status:m.progress,owner:m.owner||p.owner});
+          }
+        });
+      });
+    });
+  });
+
+  html+=`<p class="pg-sub">${items.length} items requiring attention</p>`;
+
+  items.forEach(item=>{
+    const s=(item.status||'').toLowerCase();
+    const cls=s.includes('off track')?'off-track':s.includes('paused')||s.includes('on hold')?'paused':'';
+    html+=`<div class="blk-card ${cls}" onclick="drillPartner('${item.country}','${item.channel}','${item.partner}','blockersContent')">
+      <div class="blk-loc">${item.country} · ${item.partner} · ${item.channel} · ${item.owner}</div>
+      <div class="blk-task">${item.task}</div>
+      <div class="blk-reason">${item.blocker}</div>
+    </div>`;
+  });
+
+  if(!items.length)html+=`<p style="color:var(--text-dim);padding:20px;">No active blockers.</p>`;
+  c.innerHTML=html;
+}
+
+// ── Init ──
+function init(){
+  renderHome();
+}
+
+loadData();
+</script>
+</body>
+</html>
